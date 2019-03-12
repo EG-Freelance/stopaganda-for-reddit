@@ -1,0 +1,1 @@
+This extension adds informative decals to a select few of reddit's news subreddits (including the home page and r/all) with accuracy and bias metrics (based on Media Bias/Fact Check's publicly available data).  These data can be found by clicking on an article's decals or directly at https://mediabiasfactcheck.com/

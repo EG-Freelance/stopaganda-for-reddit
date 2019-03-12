@@ -1,0 +1,32 @@
+{
+	"manifest_version": 2,
+	"name": "Stopaganda for Reddit",
+	"version": "1.2.1",
+  "applications": {
+    "gecko": {
+      "id": "stopaganda-reddit@erikgibbons.com"
+    }
+  },
+
+	"description": "Applies informative decals to select news subreddits showing bias and accuracy based on data compiled by mediabiasfactcheck.com.",
+
+	"icons": {
+		"48": "icons/stopaganda-reddit-48.png",
+		"96": "icons/stopaganda-reddit-96.png"
+	},
+
+	"browser_action": {
+		"default_icon": "icons/stopaganda-reddit-38.png"
+	},
+
+	"web_accessible_resources": [
+		"sources/sources.json"
+	],
+
+	"content_scripts": [
+		{
+			"matches": ["*://*.reddit.com/*"],
+			"js": ["stopaganda.js"]
+		}
+	]
+}
