@@ -29,9 +29,12 @@ function updateHTML(el, sourceHash, oldReddit){
         biasStyle = "background-color: rgb(0,0,150); color: white";
         break;
       case 'left-center':
-        biasStyle = "background-color: rgb(0,200,200); color: white";
+        biasStyle = "background-color: rgb(0,185,175); color: white";
         break;
-      case 'center':
+      case 'least biased':
+        biasStyle = "background-color: rgb(0,150,0); color: white";
+        break;
+      case 'pro-science':
         biasStyle = "background-color: rgb(0,150,0); color: white";
         break;
       case 'right-center':
@@ -40,39 +43,48 @@ function updateHTML(el, sourceHash, oldReddit){
       case 'right':
         biasStyle = "background-color: rgb(150,0,0); color: white";
         break;
-      case 'fake-news':
-        biasStyle = "background-color: rgb(255,0,0); color: white";
+      case 'questionable':
+        biasStyle = "background-color: rgb(0,0,0); color: white";
         break;
-      case 'conspiracy':
-        biasStyle = "background-color: rgb(255,0,0); color: white";
+      case 'conspiracy/pseudoscience':
+        biasStyle = "background-color: rgb(0,0,0); color: white";
         break;
-      case 'pro-science':
-        biasStyle = "background-color: rgb(0,150,0); color: white";
+      case 'unlisted':
+        biasStyle = "background-color: rgb(255,255,255); color: black";
         break;
+      case 'satire':
+        biasStyle = "background-color: rgb(200,0,200); color: white";
+        break;      
       default:
         biasStyle = "background-color: rgb(0,0,0); color: white";
         break;
     }
 
     switch(sourceData['accuracy']){
-      case 'VERY LOW':
-        accStyle = "background-color: rgb(150,0,0); color: white";
+      case 'very low':
+        accStyle = "background-color: rgb(255,0,0); color: black";
         break;
-      case 'LOW':
-        accStyle = "background-color: rgb(150,125,0); color: white";
+      case 'low':
+        accStyle = "background-color: rgb(255,100,0); color: white";
         break;
-      case 'MIXED':
-        accStyle = "background-color: rgb(200,200,0); color: white";
+      case 'mixed':
+        accStyle = "background-color: rgb(225,175,0); color: white";
         break;
-      case 'HIGH':
+      case 'mostly factual':
+        accStyle = "background-color: rgb(175,200,0); color: white";
+        break;
+      case 'high':
         accStyle = "background-color: rgb(125,150,0); color: white";
         break;
-      case 'VERY HIGH':
+      case 'very high':
         accStyle = "background-color: rgb(0,150,0); color: white";
         break;
-      case 'FAKE':
-        accStyle = "background-color: rgb(255,0,0); color: white";
+      case 'unlisted':
+        accStyle = "background-color: rgb(255,255,255); color: black";
         break;
+      case 'satire':
+        accStyle = "background-color: rgb(200,0,200); color: white";
+        break;      
       default:
         accStyle = "background-color: rgb(0,0,0); color: white";
         break;
@@ -82,25 +94,53 @@ function updateHTML(el, sourceHash, oldReddit){
     biasStyle = "color: rgb(0,0,0)'";
   }
 
+  var decalOpSpan = document.createElement("span");
+
+  // create opinion HTML
   if(opinion != null){
-    opHTML = "<span class='stopaganda-txt' style='font-size: 75%; white-space: nowrap; background-color: darkgray; color: white; border-radius: 5px'>&nbsp;OpEd&nbsp;</span>";
+    decalOpSpan.classList.add('stopaganda-txt');
+    decalOpSpan.style = "font-size: 75%; white-space: nowrap; background-color: darkgray; color: white; border-radius: 5px; padding-left: 3px; padding-right: 2px; margin-right: 2px"
+    decalOpSpan.textContent = "OpEd";
   }else{
-    opHTML = " ";
+    decalOpSpan.textContent = ' ';  
   }
 
   if(sourceData == null){
     if(oldReddit){
-      el[2].outerHTML = html + opHTML;
+      el[2].insertAdjacentElement('afterend', decalOpSpan);
+      // el[2].outerHTML = html + opHTML;
     }else{
-      el[0].outerHTML = html + opHTML;
+      el[0].insertAdjacentElement('afterend', decalOpSpan);
+      // el[0].outerHTML = html + opHTML;
     }
     console.log('Source ' + el[1] + ' not identified in MBFC master list');
     return true;
   }else{
+    // create DOM elements to add
+    var decalLink = document.createElement("a");
+    var decalAccSpan = document.createElement("span");
+    var decalBiasSpan = document.createElement("span");
+    // create acc HTML
+    decalAccSpan.classList.add("stopaganda-txt");
+    decalAccSpan.style = "font-size: 75%; white-space: nowrap; border-radius: 5px; padding-left: 3px; padding-right: 2px; margin-right: 5px; margin-left: 2px; " + accStyle;
+    decalAccSpan.textContent = " Acc: " + sourceData['accuracy'].toUpperCase() + " ";
+    // create bias HTML
+    decalBiasSpan.classList.add("stopaganda-txt");
+    decalBiasSpan.style = "font-size: 75%; white-space: nowrap; border-radius: 5px; padding-left: 3px; padding-right: 2px; margin-right: 5px; " + biasStyle;
+    decalBiasSpan.textContent = " Bias: " + sourceData['bias'].toUpperCase() + " ";
+    // create and populate link HTML
+    decalLink.href = url;
+    decalLink.target = "_blank";
+    decalLink.setAttribute('onmouseover', "this.setAttribute('style', 'opacity: 0.3; text-decoration: none')");
+    decalLink.setAttribute('onmouseout', "this.setAttribute('style', 'opacity: 1.0')");
+    decalLink.appendChild(decalAccSpan);
+    decalLink.appendChild(decalBiasSpan);
+    decalLink.appendChild(decalOpSpan);
+
     if(oldReddit){
-      el[2].outerHTML = " " + html + "&nbsp;<a href='" + url + "' target='_blank'><span class='stopaganda-txt' style='font-size: 75%; white-space: nowrap; " + accStyle + "; border-radius: 5px'>&nbsp;Acc: " + sourceData['accuracy'] + "&nbsp;</span>&nbsp;<span class='stopaganda-txt' style='font-size: 75%; white-space:nowrap; " + biasStyle + "; border-radius: 5px;'>&nbsp;Bias:&nbsp;" + sourceData['bias'].toUpperCase() + "&nbsp;</span>&nbsp;" + opHTML + "</a>&nbsp;";
+      el[2].insertAdjacentElement('afterend', decalLink);
     }else{
-      el[0].outerHTML = " " + html + "&nbsp;<a href='" + url + "' target='_blank'><span class='stopaganda-txt' style='font-size: 75%; white-space: nowrap; " + accStyle + "; border-radius: 5px'>&nbsp;Acc: " + sourceData['accuracy'] + "&nbsp;</span>&nbsp;<span class='stopaganda-txt' style='font-size: 75%; white-space:nowrap; " + biasStyle + "; border-radius: 5px;'>&nbsp;Bias:&nbsp;" + sourceData['bias'].toUpperCase() + "&nbsp;</span>&nbsp;" + opHTML + "</a>&nbsp;";
+      el[0].insertAdjacentElement('afterend', decalLink);
     }
     return true;
   }
@@ -114,7 +154,16 @@ function run(sourceHash, oldReddit, collection){
   }
   // set base subreddits for which tagging is relevant
   if(collection){
-    baseSubs = ['r/news', 'r/inthenews', 'r/worldnews', 'r/politics', 'r/canada'];
+    if(!oldReddit){
+      if(document.querySelectorAll('[data-click-id=subreddit]').length == 0){
+        return false;
+      }
+    }else{
+      if(document.querySelectorAll('.subreddit').length == 0){
+        return false;
+      }
+    }
+    baseSubs = ['r/news', 'r/inthenews', 'r/worldnews', 'r/politics', 'r/canada', 'r/europe', 'r/unitedkingdom'];
   }
   if(oldReddit){
     var linkParentClass = "p.title";
@@ -125,10 +174,10 @@ function run(sourceHash, oldReddit, collection){
     var sourcesArray = Array.from(sources);
     // get tags only for entries that identify as one of base subs if this is a collection page
     if(collection){
-      sourcesArray = sourcesArray.filter(function(e) { return e.parentElement.getElementsByClassName('subreddit')[0] != null }).filter(function(e) { return baseSubs.indexOf(e.parentElement.getElementsByClassName('subreddit')[0].text) >=0 });
+      sourcesArray = sourcesArray.filter(function(e) { return e.parentElement.getElementsByClassName('subreddit')[0] != null }).filter(function(e) { return baseSubs.indexOf(e.parentElement.getElementsByClassName('subreddit')[0].text) >= 0 }); // 2020.03.22 - Deprecated for NOT Old Reddit --- 2019.07.24 - Deprecated; structure changed
     }
 
-    var linkRegex = /https?\:\/\/(?:www\.)?(.*?)\//;
+    var linkRegex = /(?:https?\:\/\/)?(?:www\.)?([A-Za-z0-9\_\-\.]+)\/?/;
     // run script to add decals to each target identified
     // [fullLink, baseLink, linkElement]
     var baseLinks = sourcesArray.map(function(e){ 
@@ -136,7 +185,9 @@ function run(sourceHash, oldReddit, collection){
       return [link, link.href.match(linkRegex)[1], e.querySelector('.domain')];
     });
   }else{
-    var linkClass = ".b5szba-0";
+    var linkClass = ".styled-outbound-link";
+    // NOTE: 2019-08-06 -- following commented line is for in case the class above becomes deprecated
+    // var sources = document.querySelectorAll('[data-click-id=body] a[target=_blank]:not([data-click-id=timestamp]):not(.stopaganda)');
     // get link elements
     var sources = document.querySelectorAll(linkClass + ':not(.stopaganda)');
     // add stopaganda class to each element to make sure that script isn't run multiple times on the same element
@@ -144,10 +195,10 @@ function run(sourceHash, oldReddit, collection){
     var sourcesArray = Array.from(sources);
     // get tags only for entries that identify as one of base subs if this is a collection page
     if(collection){
-      sourcesArray = sourcesArray.filter(function(e) { return e.parentElement.parentElement.getElementsByClassName('s1i3ufq7-0')[0] != null } ).filter(function(e){ return baseSubs.indexOf(e.parentElement.parentElement.getElementsByClassName('s1i3ufq7-0')[0].text) >= 0 })
+      sourcesArray = sourcesArray.filter(function(e) { return Array.from(e.parentElement.parentElement.querySelectorAll('[data-click-id=subreddit]')).filter(function(ee){ return ee.querySelector('img') == null })[0] != null } ).filter(function(e){ return baseSubs.indexOf(Array.from(e.parentElement.parentElement.querySelectorAll('[data-click-id=subreddit]')).filter(function(ee){ return ee.querySelector('img') == null })[0].text) >= 0 })
     }
 
-    var linkRegex = /https?\:\/\/(?:www\.)?(.*?)\//;
+    var linkRegex = /(?:https?\:\/\/)?(?:www\.)?([A-Za-z0-9\_\-\.]+)\/?/;
     // run script to add decals to each target identified
     // [fullLink, baseLink, placeholder for oldReddit]
     var baseLinks = sourcesArray.map(function(e){ return [e, e.href.match(linkRegex)[1], null] });
@@ -187,17 +238,27 @@ function initObserver(){
     case 'canada':
       var collection = false;
       break;
+    case 'europe':
+      var collection = false;
+      break;
+    case 'unitedkingdom':
+      var collection = false;
+      break;
     default:
       var collection = null;
       break;
   }
-  if(!oldReddit){
-  
+  if(!oldReddit){  
+    // old Reddit doesn't have infinite scroll, so not necessary there
+
     // set target element's array in a way that won't raise an error if it doesn't exist
-    var targetNode = document.getElementsByClassName('s1rcgrht-0');
-    if(targetNode.length == 0){
-      // node doesn't exist yet; wait 500ms and try again
-      window.setTimeout(initObserver, 500);
+    var targetNodeClassName = Array.from(document.getElementsByTagName('div')).filter(function(el){ return el.children.length > 15 })[0].className; // Use this methodology to grab target element regardless of how Reddit changes class names -- 2019/06/13
+    var targetNode = document.getElementsByClassName(targetNodeClassName);
+    // var targetNode = document.getElementsByClassName('s34aip-0'); // test this symbol for new functionality - 2019/04/19
+    // var targetNode = document.getElementsByClassName('s1rcgrht-0');
+    if(targetNode.length == 0 || sourceHash == null){ // 2019-08-20 - make sure sourceHash is finished loading before trying to tag articles
+      // node or sourceHash doesn't exist yet; wait 500ms and try again
+      window.setTimeout(initObserver, 250);
       return;		
     }
     // set target element
@@ -214,6 +275,7 @@ function initObserver(){
 
     // instantiate observer
     observer.observe(targetEl, config);
+    observer.observe(document.querySelector(".rpBJOHq2PR60pnwJlUyP0").parentElement, config);
   }
 	// Run initial time on load
 	run(sourceHash, oldReddit, collection);
@@ -221,10 +283,14 @@ function initObserver(){
 
 // run initObserver whenever reddit location changes
 prevURL = '';
+prevNodeSet = document.querySelectorAll('[data-click-id=subreddit]').length;
 setInterval(function(){
-  if(prevURL != document.location.href){
+  currUrl = document.location.href;
+  currNodeSet = document.querySelectorAll('[data-click-id=subreddit]').length;
+  if((prevURL != currUrl) || (prevNodeSet != currNodeSet)){
     initObserver();
-    prevURL = document.location.href;
+    prevURL = currUrl;
+    prevNodeSet = currNodeSet;
   }
 },1000);
 
@@ -242,5 +308,6 @@ async function getData(){
 
 getData().then(json => {
   sourceHash = json;
+}).then(function(){
   initObserver();
 });
